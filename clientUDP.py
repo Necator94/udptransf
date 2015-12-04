@@ -7,11 +7,11 @@ import struct
 import os
 
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-host = "localhost";
+host = "10.42.0.15";
 port = 5000;
 newin = os.fdopen(sys.stdin.fileno(), 'rb' )
-i = 0
-while (1):
+kek = "foo bar"
+while (kek):
 #	i = i + 1
        # msg = raw_input('Your message: ')       
         kek = newin.read(500)
@@ -21,4 +21,6 @@ while (1):
        # addr = d[1]
          
 #        print 'Server reply : ' + reply
-     
+s.sendto("CLOSE", (host, port))
+newin.close()
+s.close()
