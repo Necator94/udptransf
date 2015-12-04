@@ -4,8 +4,12 @@ import struct
 import os
 
 
-newin = os.fdopen(sys.stdin.fileno(), 'r' )
+newin = os.fdopen(sys.stdin.fileno(), 'rb' )
+f = open('myfile.jpg','wb')
 
-kek = newin.read(6)
-print kek
-
+i = 0
+#while i < 1000: 
+	
+kek = newin.read()
+f.write(kek)
+#i = i + 1
