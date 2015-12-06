@@ -14,22 +14,33 @@ port = 5000;
 reply = 'foo bar'
  
 s.bind((host, port))
-
+i = 0
 while(reply) :
         
-	d = s.recvfrom(1600)
-        reply = d[0]
-        addr = d[1]     
-        
+	d = s.recvfrom(1632)
+	reply = d[0]
+	addr = d[1]     
+
 	if (reply  == "CLOSE"):
-                break
+		break
 
-      	sys.stdout.write(reply)
+	number = reply[:32] 
+	reply = reply[32:]       
+	nb = int(number, 2)
 	
+	ni = int(bin(i), 2)
+	sys.stdout.write(reply)
+	
+	if (nb == ni) :
+		s.sendto('ACK', addr)
+	else :
+		#while number == i ********************
+		s.sendto(str(i), addr)
 
+	i = i + 1
+#kek = str(len(reply))
+#s.sendto(kek, addr )         
 
-	 # s.sendto(reply, addr )         
-         # print reply
           
 s.close()
-    
+  

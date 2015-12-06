@@ -14,14 +14,44 @@ fd = os.fdopen(sys.stdin.fileno(), 'rb' )
 host = 'localhost'
 port = 5000;
 data = "foo bar"
+i = 0 
 
 while (data):
+#while (i < 20):
+	
+	data = fd.read(1600)
 
-        data = fd.read(1600)
-	s.sendto(data, (host, port))
-       # d = s.recvfrom(1024)
-       # reply = d[0]
-       # addr = d[1]
+	#**************************Packets numeration***************
+	bi = bin(i)
+	n = bi[2:]
+	print n, ' - number'
+	msg = n + data
+	lenn = len(n)
+	print (lenn), ' - length of number'
+	
+	while lenn < 32 :
+		msg = '0' + msg
+		lenn = lenn + 1
+	print len(msg), ' - length of msg'
+
+	#**********************Buffer creation**********************	
+	a = []
+	a.append(msg)
+
+	#**********************Sending******************************	
+	s.sendto(msg, (host, port))
+	print str(i), ' - number of sended pack'
+
+	#********************Recieving******************************	
+	d = s.recvfrom(100)
+	reply = d[0] 
+	print reply, ' - number of recieved pack'
+	if (reply != 'ACK')
+		***************************
+		recvN = int(reply)
+		s.sendto(a[recvN], (host, port))
+	i = i + 1
+
 
 s.sendto("CLOSE", (host, port))
 
