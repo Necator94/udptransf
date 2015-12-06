@@ -7,7 +7,6 @@ import struct
 import os
 import crcmod
 
-fun = crcmod.mkCrcFun('4812730177')
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 fd = os.fdopen(sys.stdin.fileno(), 'rb' )
 
@@ -19,8 +18,6 @@ data = "foo bar"
 while (data):
 
         data = fd.read(1600)
-	msg = fun(data)
-	print bin(msg)
 	s.sendto(data, (host, port))
        # d = s.recvfrom(1024)
        # reply = d[0]
