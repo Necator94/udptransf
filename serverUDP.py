@@ -27,15 +27,18 @@ while(reply) :
 	number = reply[:32] 
 	reply = reply[32:]       
 	nb = int(number, 2)
-	
 	ni = int(bin(i), 2)
-	sys.stdout.write(reply)
+	a = []
+	k = nb in a	
 	
-	if (nb == ni) :
+	if (nb == ni) and (k == False) :
 		s.sendto('ACK', addr)
+		sys.stdout.write(reply)
+		a.append(ni)
+		
 	else :
-		#while number == i ********************
 		s.sendto(str(i), addr)
+
 
 	i = i + 1
 #kek = str(len(reply))

@@ -24,15 +24,15 @@ while (data):
 	#**************************Packets numeration***************
 	bi = bin(i)
 	n = bi[2:]
-	print n, ' - number'
+#	print n, ' - number'
 	msg = n + data
 	lenn = len(n)
-	print (lenn), ' - length of number'
+#	print (lenn), ' - length of number'
 	
 	while lenn < 32 :
 		msg = '0' + msg
 		lenn = lenn + 1
-	print len(msg), ' - length of msg'
+#	print len(msg), ' - length of msg'
 
 	#**********************Buffer creation**********************	
 	a = []
@@ -40,16 +40,26 @@ while (data):
 
 	#**********************Sending******************************	
 	s.sendto(msg, (host, port))
-	print str(i), ' - number of sended pack'
+#	print str(i), ' - number of sended pack'
 
 	#********************Recieving******************************	
 	d = s.recvfrom(100)
 	reply = d[0] 
-	print reply, ' - number of recieved pack'
-	if (reply != 'ACK')
-		***************************
+	print reply, ' - recieved pack'
+	if (reply != 'ACK'):
+		
 		recvN = int(reply)
 		s.sendto(a[recvN], (host, port))
+		d = s.recvfrom(100)
+		reply = d[0]
+		
+		if reply != 'ACK2':
+			s.sendto(a[recvN], (host, port))
+#		else :
+#			print 'ACK2'	
+			
+#	else :
+#		print 'ACK'
 	i = i + 1
 
 
