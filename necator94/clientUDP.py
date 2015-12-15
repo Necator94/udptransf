@@ -13,54 +13,57 @@ fd = os.fdopen(sys.stdin.fileno(), 'rb' )
 #host = "10.42.0.15";
 host = 'localhost'
 port = 5000;
-data = "foo bar"
-i = 0 
+indata = "foo bar"
 
-while (data):
-#while (i < 20):
+while (indata) :
 	
-	data = fd.read(1600)
-
-	#**************************Packets numeration***************
-	bi = bin(i)
-	n = bi[2:]
-#	print n, ' - number'
-	msg = n + data
-	lenn = len(n)
-#	print (lenn), ' - length of number'
+	i = 0 
+	a = []					# Buffer creation	
+	while (i < 100) :
 	
-	while lenn < 32 :
-		msg = '0' + msg
-		lenn = lenn + 1
-#	print len(msg), ' - length of msg'
+		indata = fd.read(1600)
 
-	#**********************Buffer creation**********************	
-	a = []
-	a.append(msg)
+		#Packets numeration
+		bin_i = bin(i)
+		cleanNumber = bin_i [2 : ]
+		outString = cleanNumber + indata
+		lengthOfNumber = len(cleanNumber)
 
-	#**********************Sending******************************	
-	s.sendto(msg, (host, port))
-#	print str(i), ' - number of sended pack'
-
-	#********************Recieving******************************	
-	d = s.recvfrom(100)
-	reply = d[0] 
-	print reply, ' - recieved pack'
-	if (reply != 'ACK'):
+		#Filling free space in the beginning of packet by zeros	
+		while lengthOfNumber < 32 :
+			outString = '0' + outString
+			lengthOfNumber = lengthOfNumber + 1
+	
+		a.append(outString)			# Adding of new element
 		
-		recvN = int(reply)
-		s.sendto(a[recvN], (host, port))
-		d = s.recvfrom(100)
-		reply = d[0]
+		s.sendto(outString, (host, port))	# Sendign of outString (packet)
 		
-		if reply != 'ACK2':
-			s.sendto(a[recvN], (host, port))
-#		else :
-#			print 'ACK2'	
+		i = i + 1
+	
+		#********************Recieving******************************	
+	recvListOfAcks, addr = s.recvfrom(1632) # Define nessecary size of buffer!!!!!!!!!!!!
+		
+	ackIdentificator = recvListOfAcks [ : 3] 
+	recvListOfAcks = recvListOfAcks [3 : ]
+	recvListOfAcks = recvListOfAcks.split()
+	if (ackIdentificator == 'ACK') :
+		print recvListOfAcks
+				
+
+
 			
-#	else :
-#		print 'ACK'
-	i = i + 1
+#			recvN = int(reply)
+		#	s.sendto(a[recvN], (host, port))
+	#		d = s.recvfrom(100)
+#			reply = d[0]
+			
+#			if reply != 'ACK2':
+#				s.sendto(a[recvN], (host, port))
+#			else :
+#				print 'ACK2'	
+				
+#		else :
+#			print 'ACK'
 
 
 s.sendto("CLOSE", (host, port))

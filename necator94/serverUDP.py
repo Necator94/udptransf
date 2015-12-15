@@ -11,36 +11,46 @@ s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 #host = "10.42.0.15";
 host = 'localhost'
 port = 5000;
-reply = 'foo bar'
+indata = 'foo bar'
  
 s.bind((host, port))
-i = 0
-while(reply) :
-        
-	d = s.recvfrom(1632)
-	reply = d[0]
-	addr = d[1]     
+while(indata) :
+	i = 0
+	lossPackets = 'ACK '
+	numbersArray = []
+	dataArray = []
+        while (i < 100) :
+		indata, addr = s.recvfrom(1632)
 
-	if (reply  == "CLOSE"):
-		break
+		if (indata == "CLOSE"):
+			break
 
-	number = reply[:32] 
-	reply = reply[32:]       
-	nb = int(number, 2)
-	ni = int(bin(i), 2)
-	a = []
-	k = nb in a	
+		innumber = indata [ : 32] 
+		indata = indata [32 : ]       
 	
-	if (nb == ni) and (k == False) :
-		s.sendto('ACK', addr)
-		sys.stdout.write(reply)
-		a.append(ni)
-		
-	else :
-		s.sendto(str(i), addr)
+		binNumber = int(innumber, 2)
+		bini = int(bin(i), 2)
+	
+
+		k = binNumber in numbersArray	
+	
+		if (binNumber == bini) and (k == False) :
+		#	s.sendto('ACK', addr)		# dont foget to remove
+			numbersArray.append(bini)
+			dataArray.append(indata)
+		else :
+			lossPackets = lossPackets + str(i) + ' '
+	
+
+		i = i + 1
 
 
-	i = i + 1
+	s.sendto(lossPackets, addr)
+
+	k = 0
+	while (k < 100) :
+		sys.stdout.write(dataArray[k])
+		k = k + 1
 #kek = str(len(reply))
 #s.sendto(kek, addr )         
 
