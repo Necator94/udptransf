@@ -5,7 +5,7 @@ import sys
 import io
 import struct
 import os
-import crcmod
+#import crcmod
 
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 fd = os.fdopen(sys.stdin.fileno(), 'rb' )
@@ -37,19 +37,18 @@ while (indata) :
 		a.append(outString)			# Adding of new element
 		
 		s.sendto(outString, (host, port))	# Sendign of outString (packet)
-		kek, addr = s.recvfrom(1632)
-		print kek	
 		
 		i = i + 1
 	
 		#********************Recieving******************************	
-#	recvListOfAcks, addr = s.recvfrom(1632) # Define nessecary size of buffer!!!!!!!!!!!!
-#	ackIdentificator = recvListOfAcks [ : 3] 
-#	recvListOfAcks = recvListOfAcks [3 : ]
-#	recvListOfAcks = recvListOfAcks.split()
-#	if (ackIdentificator == 'ACK') :
-#		print recvListOfAcks
-#		s.sendto('CACK', (host, port))				
+	recvListOfAcks, addr = s.recvfrom(1632) # Define nessecary size of buffer!!!!!!!!!!!!
+		
+	ackIdentificator = recvListOfAcks [ : 3] 
+	recvListOfAcks = recvListOfAcks [3 : ]
+	recvListOfAcks = recvListOfAcks.split()
+	if (ackIdentificator == 'ACK') :
+		print recvListOfAcks
+				
 
 
 			
