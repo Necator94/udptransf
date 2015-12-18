@@ -4,16 +4,18 @@ import sys
 import io
 import struct
 import os
+import time
 
 
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-
+#s.settimeout(3)
 #host = "10.42.0.15";
 host = 'localhost'
 port = 5000;
 indata = 'foo bar'
  
 s.bind((host, port))
+m = 0
 while(indata) :
 	i = 0
 	lossPackets = 'ACK '
@@ -32,21 +34,26 @@ while(indata) :
 		bini = int(bin(i), 2)
 	
 
-		k = binNumber in numbersArray	
+#		k = binNumber in numbersArray	
 	
-		if (binNumber == bini) and (k == False) :
+#		if (binNumber == bini) and (k == False) :
 		#	s.sendto('ACK', addr)		# dont foget to remove
-			numbersArray.append(bini)
-			dataArray.append(indata)
-		else :
-			lossPackets = lossPackets + str(i) + ' '
+		numbersArray.append(bini)
+		dataArray.append(indata)
+#		else :
+#			lossPackets = lossPackets + str(i) + ' '
+		s.sendto(str(i), addr)
 	
 
 		i = i + 1
 
 
-	s.sendto(lossPackets, addr)
-
+#	s.sendto(lossPackets, addr)
+#	time.clock()
+#	try :
+#		indata, addr = s.recvfrom(1632)
+#	except s.timeout :
+#		s.sendto(lossPackets, addr)
 	k = 0
 	while (k < 100) :
 		sys.stdout.write(dataArray[k])

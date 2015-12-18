@@ -37,18 +37,19 @@ while (indata) :
 		a.append(outString)			# Adding of new element
 		
 		s.sendto(outString, (host, port))	# Sendign of outString (packet)
+		kek, addr = s.recvfrom(1632)
+		print kek	
 		
 		i = i + 1
 	
 		#********************Recieving******************************	
-	recvListOfAcks, addr = s.recvfrom(1632) # Define nessecary size of buffer!!!!!!!!!!!!
-		
-	ackIdentificator = recvListOfAcks [ : 3] 
-	recvListOfAcks = recvListOfAcks [3 : ]
-	recvListOfAcks = recvListOfAcks.split()
-	if (ackIdentificator == 'ACK') :
-		print recvListOfAcks
-				
+#	recvListOfAcks, addr = s.recvfrom(1632) # Define nessecary size of buffer!!!!!!!!!!!!
+#	ackIdentificator = recvListOfAcks [ : 3] 
+#	recvListOfAcks = recvListOfAcks [3 : ]
+#	recvListOfAcks = recvListOfAcks.split()
+#	if (ackIdentificator == 'ACK') :
+#		print recvListOfAcks
+#		s.sendto('CACK', (host, port))				
 
 
 			
