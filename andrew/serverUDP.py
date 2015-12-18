@@ -8,7 +8,7 @@ import os
 
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-#host = "10.42.0.15";
+#host = "10.42.0.1";
 host = 'localhost'
 port = 5000;
 indata = 'foo bar'
