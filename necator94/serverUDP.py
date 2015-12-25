@@ -5,6 +5,7 @@ import io
 import struct
 import os
 import time
+
 def splitting(indata):
 	innumber = indata [ : 32] 
 	indata = indata [32 : ]       
@@ -12,80 +13,94 @@ def splitting(indata):
 	packetIndex = int(binNumber) 
 	return packetIndex,indata
 
-def lookForNone(dataArray):
-	lostPackets = 'ACK '
-	for k in range(len(dataArray)):
-		if dataArray[k] == None:  lostPackets = lostPackets + str(k) + ' '
-	return lostPackets
-
+def defTripTime(addr, t) :
+	s.settimeout(t)
+	t0 = time.time()
+	
+	s.sendto('triptimedelay', addr)
+	try :
+		indata, addr = s.recvfrom(13)
+        	if (indata == 'triptimedelay') :
+            		t = (time.time() - t0) * 10
+			
+			
+			return t
+	except socket.timeout:
+         	s.sendto('triptimedelay', addr)
+		try :
+			indata, addr = s.recvfrom(13)
+               		if (indata == 'triptimedelay') :
+	                	t = (time.time() - t0) * 10
+				
+				return t
+		except socket.timeout:
+			s.sendto('triptimedelay', addr)
+#	except socket.timeout:
+#                s.sendto('triptimedelay', addr)
+#                indata, addr = s.recvfrom(13)
+#                if (indata == 'triptimedelay') :
+#                        t = (time.clock() - t0) * 5000
+#                        return t
 
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
 #host = "10.42.0.15";
-host = '10.42.0.1'
+host = '0.0.0.0'
 port = 5000;
 indata = 'foo bar'
 lostPackets = 'ACK'
-flag = True
+t = 3
+sizeOfBlock = 100
+
 s.bind((host, port))
 while(indata) :
+	Ncycles = 1
 	i = 0
-	dataArray = [None] * 100
+	dataArray = [None] * sizeOfBlock
 	numbersArray = []
-        while (i < 100) :
+        while (i < sizeOfBlock) :
 		indata, addr = s.recvfrom(1632)
 
 		if (indata == "CLOSE"):
-			break
+			exit(0)
 
 		packetIndex, indata = splitting(indata)
 		dataArray[packetIndex] = indata
-		print '43'
 		if (packetIndex != i) :
+			Ncycles = 0
 			lostPackets = lostPackets + str(i) + ' '
-			print '46'
-		if (flag == True) :
-			print '48'
-			s.settimeout(2.2)
-			t0 = time.clock()
-			s.sendto('triptimedelay', addr)
-			print '51'		
-			try :
-              			print '54'
-				indata, addr = s.recvfrom(1632)
-               			if (indata == 'triptimedelay') :
-                      			t = time.clock() - t0
-					flag = False
-       					print '59'
-			except socket.timeout:
-               			s.sendto('triptimedelay', addr)
-				indata, addr = s.recvfrom(1632)
-                                if (indata == 'triptimedelay') :
-                                        t = time.clock() - t0
-					flag = False
-	print '66'
-	i = i + 1
-	s.sendto(lostPackets, addr)
-	s.settimeout(t + 0.2)
-	try :
-		indata, addr = s.recvfrom(1632)
-		if (indata != 'ACK RECIEVED') :
-			packetIndex, indata = splitting(indata)
-			dataArray[packetIndex] = indata
-	except socket.timeout:
-		s.sendto(lostPackets, addr)
-		indata, addr = s.recvfrom(1632)
-                if (indata != 'ACK RECIEVED') :
-                        packetIndex, indata = splitting(indata)
-                        dataArray[packetIndex] = indata
+			Ncycles = Ncycles + 1
+		i = i + 1
 	
-#	k = 0
-#	while (k < 100) :
+	t = defTripTime(addr, t)
+
+	s.sendto(lostPackets, addr)
+	s.settimeout(t)
+	l = 0
+	while (l < Ncycles) :
+		
+		try :
+			indata, addr = s.recvfrom(1632)
+			if (indata != 'ACK RECIEVED') :
+				packetIndex, indata = splitting(indata)
+				dataArray[packetIndex] = indata
+		except socket.timeout:
+			s.sendto(lostPackets, addr)
+			try : 
+				indata, addr = s.recvfrom(1632)
+               			if (indata != 'ACK RECIEVED') :
+               				packetIndex, indata = splitting(indata)
+                     			dataArray[packetIndex] = indata
+			except socket.timeout:
+		        	s.sendto(lostPackets, addr)
+		l = l + 1
+	k = 0
+	while (k < sizeOfBlock) :
 #		if (dataArray[k] == None) :
 #			exit(0)
 		
-#		sys.stdout.write(dataArray[k])
-#		k = k + 1
+		sys.stdout.write(dataArray[k])
+		k = k + 1
           
 s.close()
   
