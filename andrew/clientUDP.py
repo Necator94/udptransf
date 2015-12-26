@@ -42,19 +42,17 @@ while (indata) :
 		
 		i = i + 1					# Move to the next packet
 		
-	s.settimeout(1)
-	try:	
-		RTTdata, addr = s.recvfrom(13)				# Recieve packet to determine RTT (it is evaluated by server side) 
-		if (RTTdata == 'triptimedelay') :			# If packet contains 'triptimedelay', then send it back
-			s.sendto('triptimedelay',addr)
-	except socket.timeout:
-		
+	RTTdata, addr = s.recvfrom(13)				# Recieve packet to determine RTT (it is evaluated by server side) 
+	if (RTTdata == 'triptimedelay') :			# If packet contains 'triptimedelay', then send it back
+		s.sendto('triptimedelay',addr)
+#	print 'triptimedelay'
+
 
 		#********************Recieving******************************	
 	# ADD s.timeout in order to avoid error
 
 	recvListOfAcks, addr = s.recvfrom(1632) 		# Define necessary size of buffer!!!!!!!!!!!! Recieve message with either "ACK" or "ACK + lost packets numbers", store the message in recvListOfAcks
-		
+#	print recvListOfAcks		
 	ackIdentificator = recvListOfAcks [ : 3] 		# Split recvListOfAcks into 2 strings. The first contains ACK
 	recvListOfAcks = recvListOfAcks [3 : ]			# The second contains numbers of lost packets
 	recvListOfAcks = recvListOfAcks.split()			# Split string by empty spaces
@@ -62,12 +60,12 @@ while (indata) :
 #		print recvListOfAcks
 		if len(recvListOfAcks) == 0 :			# If there are no numbers of lost packets, send ACK RECIEVED
 			s.sendto('ACK RECIEVED',addr)
-#			print 'tttt'
+#			print 'ack recieved'
 		else :
 			for n in recvListOfAcks :		# Otherwise send lost packets back to the server 
 				k = int(n)			
 				s.sendto(a[k],addr)
-#				print 'rttt'
+#				print k, 'index of returned data'
 
 
 s.sendto("CLOSE", (host, port))					
