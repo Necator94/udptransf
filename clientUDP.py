@@ -74,7 +74,7 @@ while (indata) :
 				s.sendto('ACK RECIEVED',addr)
 		except socket.timeout:
 			foo = 'bar'
-	s.settimeout(None)
+		s.settimeout(None)
 s.sendto("CLOSE", (host, port))					
 logs.write('CLOSE sent'+'\n')
 logs.close()
