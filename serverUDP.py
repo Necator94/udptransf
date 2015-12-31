@@ -6,13 +6,6 @@ import struct
 import os
 import time
 #------------------------------------------------------------------------
-def splitting(indata):
-	innumber = indata [ : 32] 
-	indata = indata [32 : ]       
-	binNumber = int(innumber, 2)
-	packetIndex = int(binNumber) 
-	return packetIndex,indata
-#------------------------------------------------------------------------
 def defTripTime(addr, t):
 	s.settimeout(t)
 	t0 = time.time()
@@ -30,24 +23,27 @@ def defTripTime(addr, t):
 			t0 = time.time()
 	         	s.sendto('triptimedelay', addr)
 #------------------------------------------------------------------------
-def lookForNone(dataArray) :
-	lostPackets = 'ACK'
-	n_cycles = 0	
-	for index, element in enumerate(dataArray) :
-     		if element == None:
-			lostPackets = lostPackets + str(index) + ' '
-			n_cycles = n_cycles + 1
-	return lostPackets, n_cycles
+# Search of empty spaces (not recieved packets) in data array, creation of a string with lost packets for sending and lost packets amount calculation   
+def lookForNone(dataArray) :						# Have dataArray - recieved strings as input argument
+	lostPackets = 'ACK'						# Identifying word in the begining of the string 
+	n_cycles = 0							# Initialization of variable with amount of lost packets
+	for index, element in enumerate(dataArray) :			# index - array element index, element - array string content
+     		if element == None:					# Check on 'None' existing in string of array (None means packet lost) 
+			lostPackets = lostPackets + str(index) + ' '	# Formation of the string for sending to client
+			n_cycles += 1					# Append another '1' (another packet lost)
+	return lostPackets, n_cycles					# Retun of the strings to main programm
 #------------------------------------------------------------------------
-def ackToClient(t):	
-	outString = bin(int(round(t * 1000000))) [2 : ]                 # Sum up number of frame with data enclosed
-   	lengthOfNumber = len(bin(int(round((t * 1000000)))) [2 : ])               # Convert from binary to decimal type
-        #Filling free space in the beginning of packet with zeros       
-        while lengthOfNumber < 28 :                     # Cycle creation
-		outString = '0' + outString             # Fulfill with zero till full space of number
-        	lengthOfNumber = lengthOfNumber + 1     # Move to the next place
-	outString = 'SACK' + outString 
-	return outString
+# Positive acknowlage creation for the client (timeout information included)
+def ackToClient(t):							# Have t - timeout as input argument of function
+	outStr = bin(int(round(t * 1000000))) [2 : ]                	# Creation of a string with current value of timeout in binary string format
+   	lenNumber = len(bin(int(round((t * 1000000)))) [2 : ])        	# Timeout value length definition in bytes
+#Filling free space in the middle of packet with zeros       
+        while lenNumber < 28 :                    			# Cycle creation
+		outStr = '0' + outStr          				# Fulfill with zero till full space of number
+        	lenNumber += 1		    				# Move to the next place
+	outStr = 'SACK' + outStr 					# Finall string formation for sending
+	return outStr							# Return of the string to main program
+#------------------------------------------------------------------------
 
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 logs = open('logs.txt', 'w')
@@ -73,9 +69,8 @@ while indata:
 				logs.write('CLOSE recieved'+'\n'+'exit(0)'+'\n')
 				exit(0)
 		
-			packetIndex, indata = splitting(indata)
-			dataArray[packetIndex] = indata
-			logs.write(str(i)+'   - number of iteration|    '+ str(packetIndex)+'   - index of recieved packet'+'\n')
+			dataArray[int(int(indata[:32], 2))] = indata[32:]
+			logs.write(str(i)+'   - number of iteration|    '+ (str(int(int(indata[:32], 2))))+'   - index of recieved packet'+'\n')
 			i += 1	
 		except socket.timeout :
 			logs.write(str(i)+'....amount of recieved packets, timeout reached')
@@ -86,10 +81,6 @@ while indata:
 	lostPackets, n_cycles = lookForNone(dataArray)
 	logs.write('lookForNone|   '+str(lostPackets)+'  - lostPackets|    '+ str(n_cycles)+'   - n_cycles'+'\n')
 	s.settimeout(t)
-
-
- 
-
 	if n_cycles > 0:
 		s.sendto(lostPackets, addr)
 		logs.write(str(lostPackets)+'....lost packets sent to client after cycle 1'+'\n')
@@ -100,21 +91,17 @@ while indata:
 			try :
 				indata, addr = s.recvfrom(1432)
 				if indata != 'ACK RECIEVED':
-					packetIndex, indata = splitting(indata)
-					logs.write(str(packetIndex)+'.....index of recieved lost packet 1 attempt'+ '\n')
-					dataArray[packetIndex] = indata
+					logs.write(str(int(int(indata[:32], 2))) + '.....index of recieved lost packet 1 attempt'+ '\n')
+					dataArray[int(int(indata[:32], 2))] = indata[32:]
 			except socket.timeout:
 				s.sendto(lostPackets, addr)
 				logs.write(str(lostPackets)+'.....first timeout in ebota, packet list sent again 2'+ '\n')
 
 			lostPackets, n_cycles = lookForNone(dataArray)
 			logs.write('lookForNone|   '+str(lostPackets)+'  - lostPackets|    '+ str(n_cycles)+'   - n_cycles'+'\n')
-
-	
 	if n_cycles == 0:
-		ack = ackToClient(t)
-		s.sendto(ack, addr)
-		logs.write(str(ack)+'....ack + timeout'+'\n')
+		s.sendto(ackToClient(t), addr)
+		logs.write(str(ackToClient(t))+'....ack + timeout'+'\n')
  		logs.write('if '+str(n_cycles)+' == 0'+ '\n') 
 		while True:
 			try:
@@ -125,8 +112,6 @@ while indata:
 			except socket.timeout:
 				s.sendto(ack, addr)
 				logs.write(str(lostPackets)+'.....timeout in hueta, packet list sent again'+ '\n')
-	
-	
 	logs.write('WRITING to file'+ '\n')
 	k = 0
 	while k < sizeOfBlock:
