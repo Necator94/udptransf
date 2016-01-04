@@ -16,7 +16,7 @@ def defTripTime(addr, t):
        			if (indata == 'triptimedelay') :
             			t = (time.time() - t0)
 				if t < 0.02:
-					t *= 1.5 
+					t *= 100 
 				return t
 				break
 		except socket.timeout:
@@ -51,7 +51,7 @@ logs = open('logs.txt', 'w')
 host = '0.0.0.0'
 port = 5000;
 indata = 'foo bar'
-t = 2 
+t = 2.2 
 sizeOfBlock = 400
 
 s.bind((host, port))
@@ -107,10 +107,10 @@ while indata:
 			try:
 				indata, addr = s.recvfrom(1432)
 				logs.write(str(indata)+'.....positive ACK from client1 '+ '\n')
-				if indata == 'ACK RECIEVED':
+				if indata == 'ACK RECIEVED' or len(indata[32:]) != 0:
 					break	
 			except socket.timeout:
-				s.sendto(ack, addr)
+				s.sendto(ackToClient(t), addr)
 				logs.write(str(lostPackets)+'.....timeout in hueta, packet list sent again'+ '\n')
 	logs.write('WRITING to file'+ '\n')
 	k = 0
