@@ -12,7 +12,7 @@ def packetNumeration(i, indata):
 	outString = bin(i) [2 : ] + indata		# Sum up number of frame with data enclosed
 	lengthOfNumber = len(bin(i) [2 : ])		# Convert from binary to decimal type
 	#Filling free space in the beginning of packet with zeros	
-	while lengthOfNumber < 32:			# Cycle creation
+	while lengthOfNumber < 10:			# Cycle creation
 		outString = '0' + outString		# Fulfill with zero till full space of number
 		lengthOfNumber = lengthOfNumber + 1	# Move to the next place
 	return outString
@@ -37,7 +37,7 @@ while (indata) :
 	a = []							# Buffer creation
 	logs.write('BEGIN of main While'+'\n')
 	while i < sizeOfBlock:				# Cycle creation
-		indata = fd.read(1400)				# Read data with specified buffer size
+		indata = fd.read(1422)				# Read data with specified buffer size
 		dataCounter += len(indata)
 		dataString = packetNumeration(i, indata)
 		a.append(dataString)				# Add new element to array a[]
@@ -53,28 +53,28 @@ while (indata) :
 			logs.write(str(ackList) + '....triptimedelay'+'\n')
 	
 		if ackList[:4] == 'SACK':		# If there are no numbers of lost packets, send ACK RECIEVED
-			t = int(int(ackList [4:32], 2)) / 1000000.0
-			#if t < 0.02:
-			#	t *= 10
-		#	t *= 10 
+	#		t = int(int(ackList [4:32], 2)) / 1000000.0
+#			if t < 0.02:
+#				t *= 10
+#			t *= 10 
 			s.sendto('ACK RECIEVED',addr)
 			logs.write('ACK RECIEVED was sent to server'+'\n')
 			break
 
-		if ackList[:3] == 'ACK' and len(ackList[32:]) != 0:
-			for n in ackList.split()[32:]:		# Otherwise send lost packets back to the server 			
+		if ackList[:3] == 'ACK' :
+			for n in ackList[3:].split():		# Otherwise send lost packets back to the server 			
 				s.sendto(a[int(n)], addr)
  				logs.write(str(n) + '....index of returned data'+'\n')
 	logs.write('end of wile true'+'\n')
-	if t < 0.02:
-		s.settimeout(t)
-		try:
-			ackList, addr = s.recvfrom(1432)
-			if ackList[:4] == 'SACK':
-				s.sendto('ACK RECIEVED',addr)
-		except socket.timeout:
-			foo = 'bar'
-		s.settimeout(None)
+#	if t < 0.02:
+#		s.settimeout(t)
+#		try:
+#			ackList, addr = s.recvfrom(1432)
+#			if ackList[:4] == 'SACK':
+#				s.sendto('ACK RECIEVED',addr)
+#		except socket.timeout:
+#			foo = 'bar'
+#		s.settimeout(None)
 s.sendto("CLOSE", (host, port))					
 logs.write('CLOSE sent'+'\n')
 logs.close()
