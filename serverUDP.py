@@ -7,6 +7,7 @@ import os
 import time
 #------------------------------------------------------------------------
 def defTripTime(addr, t):
+	defTripTime.func_code = (lambda addr, t:t).func_code
 	s.settimeout(t)
 	t0 = time.time()
 	s.sendto('triptimedelay', addr)
@@ -15,8 +16,10 @@ def defTripTime(addr, t):
 			indata, addr = s.recvfrom(13)
        			if (indata == 'triptimedelay') :
             			t = (time.time() - t0)
-				if t < 0.2:
-					t *= 2 
+				if t < 0.02:
+					t *= 10
+				else:
+					t *= 1.2
 				return t
 				break
 		except socket.timeout:
@@ -92,6 +95,9 @@ while indata:
 			logs.write('begin of ebota'+ '\n')
 			try :
 				indata, addr = s.recvfrom(1432)
+				if indata == "CLOSE":
+					logs.write('CLOSE recieved'+'\n'+'break in n_cycles > 0'+'\n')
+					break
 				if indata != 'ACK RECIEVED':
 					logs.write(str(int(int(indata[:10], 2))) + '.....index of recieved lost packet 1 attempt'+ '\n')
 					dataArray[int(int(indata[:10], 2))] = indata[10:]
@@ -107,7 +113,11 @@ while indata:
 		logs.write('SACK'+'....ack to client'+'\n')
 		while True:
 			try:
+				
 				indata, addr = s.recvfrom(1432)
+				if indata == "CLOSE":
+					logs.write('CLOSE recieved'+'\n'+'break in n_cycles == 0'+'\n')
+					break
 				logs.write(str(indata)+'.....positive ACK from client1 '+ '\n')
 				if indata == 'ACK RECIEVED' or len(indata[10:]) !=0 :
 					break	
