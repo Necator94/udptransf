@@ -57,10 +57,6 @@ while (indata) :
 			logs.write(str(ackList) + '....triptimedelay'+'\n')
 	
 		if ackList[:4] == 'SACK':			# If packet contains 'SACK', send ACK RECIEVED
-	#		t = int(int(ackList [4:32], 2)) / 1000000.0
-#			if t < 0.02:
-#				t *= 10
-#			t *= 10 
 			s.sendto('ACK RECIEVED',addr)
 			logs.write('ACK RECIEVED was sent to server'+'\n')
 			break
@@ -70,15 +66,7 @@ while (indata) :
 				s.sendto(a[int(n)], addr)
  				logs.write(str(n) + '....index of returned data'+'\n')
 	logs.write('end of wile true'+'\n')
-#	if t < 0.02:
-#		s.settimeout(t)
-#		try:
-#			ackList, addr = s.recvfrom(1432)
-#			if ackList[:4] == 'SACK':
-#				s.sendto('ACK RECIEVED',addr)
-#		except socket.timeout:
-#			foo = 'bar'
-#		s.settimeout(None)
+
 closeSession = [None] * 5					# Send to server a command to stop recieving data from client
 closeSession[0] = 'CLOSE'
 s.sendto(str(closeSession), (host, port))					
