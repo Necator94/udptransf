@@ -1,4 +1,4 @@
-# UDP transfering of files
+# UDP socket for file transfering 
 -----------------------------------------------------------------------------------------------------------------------------
 UDP client/server with guaranteed delivery of packets (implemented on python)
 
