@@ -11,3 +11,4 @@ Some features of sockets:
 | 10         | 10      | Less than 14     | 3.03                     |
 | 100        | 10      | Less than 20     | 13.44                    |
 | 1000       | 1       | Less than 40     | 21.7                     |
+Size of transfered binary file - 4.25 M 
