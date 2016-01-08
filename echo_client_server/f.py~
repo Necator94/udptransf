@@ -1,0 +1,41 @@
+#!/usr/bin/python
+import socket
+
+RECIEVE_FROM = "0.0.0.0" #recieve connections from any ip-addresses
+PORT = 8000 #port of created socket
+ClientsN = 2 #number of concurent client
+PACKET_SIZE = 1400
+
+#Creating TCP socket
+#AF_INET - address family
+#SOCK_STREAM - TCP - socket
+tcpSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
+
+tcpSocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1) # makes socket reused
+
+cpSocket.bind((RECIEVE_FROM, PORT)) #Binding created socket to addresses and port
+
+tcpSocket.listen(ClientsN) #starting listening created socked in order to recieve not mre than ClientN clients
+
+#print 'Waiting for a client'
+
+#client - is client-side socket
+#ip - client's ip address
+#port - client's port
+(client, (ip, port)) = tcpSocket.accept() #accept is blocking call for waiting incoming clients
+
+#print 'Recieved connection from ', ip
+#print 'Starting echo output ...'
+data = 'foobar'
+
+while len(data):
+	data = client.recv(PACKET_SIZE)
+	print 'Client sent: ', data
+#print data
+	client.send(data)
+
+#print 'Closing connection ...'
+	client.close()
+
+#print 'Shutting down server ...'
+	tcpSocket.close()
